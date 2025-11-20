@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>갓메이드 동의서 + 운동교정 초기 문진</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --accent: #22c55e;
+      --bg: #f3f4f6;
+      --card-bg: #ffffff;
+      --text-main: #111827;
+      --text-sub: #6b7280;
+      --border: #e5e7eb;
+      --radius-xl: 18px;
+      --radius-md: 12px;
+      --shadow-soft: 0 18px 40px rgba(15, 23, 42, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Pretendard", system-ui, sans-serif;
+      background: radial-gradient(circle at top, #e0edff 0, #f3f4f6 50%, #f3f4f6 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 32px 16px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 900px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* Header */
+    .header {
+      margin-bottom: 18px;
+      text-align: left;
+    }
+
+    .badge-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .logo-dot {
+      width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      background: conic-gradient(from 140deg, #22c55e, #2563eb, #a855f7, #22c55e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 0.78rem;
+      font-weight: 700;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.45);
+    }
+
+    .badge {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #e0ebff;
+      color: #1d4ed8;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .header-title {
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 4px;
+    }
+
+    .header-title span {
+      color: var(--primary);
+    }
+
+    .header-subtitle {
+      font-size: 0.9rem;
+      color: var(--text-sub);
+      line-height: 1.5;
+    }
+
+    .header-subtitle strong {
+      color: #111827;
+    }
+
+    /* Card */
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      padding: 20px 20px 18px;
+    }
+
+    @media (max-width: 640px) {
+      .card {
+        padding: 16px 14px 14px;
+      }
+    }
+
+    .top-note {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+      font-size: 0.8rem;
+      color: var(--text-sub);
+    }
+
+    .top-note strong {
+      color: #111827;
+    }
+
+    .top-chip {
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: #f1f5f9;
+      font-size: 0.75rem;
+    }
+
+    form {
+      font-size: 0.86rem;
+    }
+
+    /* Section */
+    .section {
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: #f9fafb;
+      padding: 12px 12px 10px;
+      margin-bottom: 10px;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .section-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .section-tag {
+      font-size: 0.7rem;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: #e5e7eb;
+      color: #4b5563;
+    }
+
+    .section-desc {
+      font-size: 0.78rem;
+      color: var(--text-sub);
+    }
+
+    .fields-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    @media (max-width: 640px) {
+      .fields-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .field {
+      margin-bottom: 6px;
+    }
+
+    .field-label {
+      font-size: 0.8rem;
+      margin-bottom: 3px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .required {
+      font-size: 0.72rem;
+      color: #b91c1c;
+    }
+
+    input[type="text"],
+    input[type="tel"],
+    input[type="number"],
+    input[type="date"],
+    textarea {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      font-size: 0.84rem;
+      font-family: inherit;
+      outline: none;
+      background: #ffffff;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #9ca3af;
+    }
+
+    input:focus,
+    textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.25);
+    }
+
+    textarea {
+      min-height: 60px;
+      resize: vertical;
+    }
+
+    .choice-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .choice {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid #e5e7eb;
+      background: #ffffff;
+      font-size: 0.78rem;
+      cursor: pointer;
+    }
+
+    .choice input {
+      width: 12px;
+      height: 12px;
+    }
+
+    .helper {
+      font-size: 0.74rem;
+      color: var(--text-sub);
+      margin-top: 3px;
+    }
+
+    /* Pain scale */
+    .pain-scale {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .pain-boxes {
+      display: flex;
+      gap: 4px;
+    }
+
+    .pain-box {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      border: 1px solid #d1d5db;
+      background: #ffffff;
+      cursor: pointer;
+    }
+
+    .pain-box.active {
+      background: linear-gradient(135deg, #fb923c, #ef4444);
+      border-color: #f97316;
+    }
+
+    .pain-value {
+      font-size: 0.78rem;
+      color: #f97316;
+      min-width: 52px;
+    }
+
+    /* Footer / submit / nav buttons */
+    .submit-row {
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px dashed #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .submit-note {
+      font-size: 0.75rem;
+      color: var(--text-sub);
+    }
+
+    .submit-note strong {
+      color: #111827;
+    }
+
+    .btn-primary {
+      border-radius: 999px;
+      border: none;
+      padding: 9px 18px;
+      font-size: 0.86rem;
+      font-weight: 600;
+      color: #ffffff;
+      background: linear-gradient(90deg, #2563eb, #22c55e);
+      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.4);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .btn-secondary {
+      border-radius: 999px;
+      border: 1px solid #cbd5f5;
+      padding: 8px 16px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: #1e293b;
+      background: #e5edff;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .btn-primary span.icon,
+    .btn-secondary span.icon {
+      font-size: 1rem;
+    }
+
+    /* Success */
+    .success {
+      padding: 40px 16px 26px;
+      text-align: center;
+    }
+
+    .success-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 999px;
+      margin: 0 auto 14px;
+      background: radial-gradient(circle at top, #22c55e 0, #16a34a 45%, #15803d 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ecfdf5;
+      font-size: 1.7rem;
+      box-shadow: 0 12px 28px rgba(16, 185, 129, 0.6);
+    }
+
+    .success-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .success-text {
+      font-size: 0.86rem;
+      color: var(--text-sub);
+      margin-bottom: 12px;
+    }
+
+    .success-text span {
+      color: #111827;
+      font-weight: 600;
+    }
+
+    .success-footer {
+      font-size: 0.78rem;
+      color: #6b7280;
+    }
+
+    a.admin-link {
+      color: #2563eb;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    /* 동의서 전용 스타일 */
+    .consent-list {
+      font-size: 0.8rem;
+      color: var(--text-sub);
+      padding-left: 16px;
+      margin-top: 4px;
+      margin-bottom: 6px;
+    }
+
+    .consent-list li {
+      margin-bottom: 2px;
+    }
+
+    .consent-check-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .consent-sign {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .consent-sign .field {
+      flex: 1;
+      min-width: 160px;
+    }
+
+    .consent-emphasis {
+      font-size: 0.8rem;
+      color: #b91c1c;
+      margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+  <!-- ✅ PAGE 1 : 동의서 -->
+  <div class="page" id="page-1">
+    <header class="header">
+      <div class="badge-row">
+        <div class="logo-dot">GM</div>
+        <div class="badge">갓메이드 운동교정 · Consent</div>
+      </div>
+      <h1 class="header-title">📄 <span>개인정보 및 데이터 활용 동의서</span></h1>
+      <p class="header-subtitle">
+        갓메이드는 고객님의 <strong>맞춤 운동교정, 자세·보행 분석, AI 기반 서비스 제공</strong>을 위하여<br />
+        아래와 같이 개인정보 및 신체 데이터를 수집·이용하고자 합니다.
+      </p>
+    </header>
+
+    <main class="card" id="consent-card">
+      <div class="top-note">
+        <div>
+          <strong>① 동의 여부 선택 → ② 다음 페이지에서 문진표 작성</strong><br />
+          모든 내용은 법령에 따라 안전하게 관리되며, 동의는 언제든지 철회하실 수 있습니다.
+        </div>
+        <div class="top-chip">갓메이드 내부 상담·연구용으로만 사용됩니다.</div>
+      </div>
+
+      <!-- 동의서 내용 -->
+      <section class="section">
+        <div class="section-header">
+          <div class="section-title">1. 수집 항목</div>
+          <div class="section-tag">개인정보 · 건강정보</div>
+        </div>
+        <ul class="consent-list">
+          <li><strong>기본 정보</strong> : 성명, 성별, 나이, 연락처, 직업 등</li>
+          <li><strong>건강·신체 정보</strong> : 통증 부위 및 정도, 불편 증상, 과거 부상/수술 및 병력, 생활 습관, 운동/활동 수준, 체형·자세·보행 특성 등</li>
+          <li><strong>측정 및 분석 데이터</strong> : 보행 분석 데이터, 자세·체형 분석 데이터, 관절 가동 범위, 균형·근력 관련 평가 결과 등</li>
+          <li><strong>영상·사진 데이터</strong> : 교정 전·후 비교 이미지(B&A), 자세·보행 촬영 영상 등</li>
+          <li><strong>이용 정보</strong> : 상담 및 운동 기록, 프로그램 이용 내역, 설문 응답, 상담 메모 등</li>
+        </ul>
+      </section>
+
+      <section class="section">
+        <div class="section-header">
+          <div class="section-title">2. 수집 및 이용 목적</div>
+        </div>
+        <ul class="consent-list">
+          <li>맞춤형 운동교정, 재활, 체형·자세 교정 서비스 제공</li>
+          <li>보행 및 자세 패턴 분석을 통한 통증 원인 추정 및 개선 방향 제시</li>
+          <li>서비스 품질 향상 및 새로운 프로그램·제품(보행분석 머신 등) 개발</li>
+          <li>AI·빅데이터 기반 연구 및 통계 분석 (개인 식별이 불가능한 형태로 처리)</li>
+          <li>내부 교육, 상담 기록 관리 및 고객 응대</li>
+        </ul>
+      </section>
+
+      <section class="section">
+        <div class="section-header">
+          <div class="section-title">3. 보유 및 이용 기간</div>
+        </div>
+        <ul class="consent-list">
+          <li>수집일로부터 <strong>5년간 보관 후, 법령에 따른 기간을 초과하지 않는 범위 내에서 안전하게 파기</strong>됩니다.</li>
+          <li>관련 법령(의료·세무 등)에 따라 별도의 보존 기간이 정해진 경우, 해당 법령을 우선합니다.</li>
+        </ul>
+      </section>
+
+      <section class="section">
+        <div class="section-header">
+          <div class="section-title">4. 고객님의 권리</div>
+        </div>
+        <ul class="consent-list">
+          <li>개인정보 및 건강정보 수집·이용에 대한 동의를 <strong>거부하실 수 있으며</strong>, 그로 인해 서비스 이용에 제한은 없습니다.</li>
+          <li>동의하신 이후에도 언제든지 <strong>열람·정정·삭제·이용정지</strong>를 요청하실 수 있습니다.</li>
+        </ul>
+      </section>
+
+      <section class="section">
+        <div class="section-header">
+          <div class="section-title">5. 세부 동의 항목</div>
+          <div class="section-tag">개인정보는 필수 · 나머지는 선택</div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">[필수] 개인정보 및 건강정보 수집·이용 동의 <span class="required">필수</span></div>
+          <div class="consent-check-row">
+            <label class="choice">
+              <input type="checkbox" id="agree_personal" /> 위와 같은 내용으로 <strong>개인정보 및 건강정보 수집·이용에 동의합니다.</strong>
+            </label>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">[선택] 영상·사진·측정 데이터 활용 동의</div>
+          <div class="consent-check-row">
+            <label class="choice">
+              <input type="checkbox" id="agree_media" /> 교정 전·후 사진, 자세/보행 영상, 측정 데이터를 <strong>교정·분석 및 기록 관리 목적</strong>으로 사용하는 것에 동의합니다.
+            </label>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">[선택] AI·연구/통계 목적 활용 동의</div>
+          <div class="consent-check-row">
+            <label class="choice">
+              <input type="checkbox" id="agree_ai" /> 본인 정보를 익명·가명 처리하여 AI 개발 및 서비스 품질 향상에 활용하는 것에 동의합니다.
+            </label>
+          </div>
+          <p class="helper">※ 선택 항목(영상·AI)은 동의하지 않으셔도 서비스 이용에는 제한이 없으며, 동의 여부는 언제든지 변경 가능합니다.</p>
+        </div>
+
+        <p class="consent-emphasis">
+          ※ 이름/날짜 기입 여부와 관계없이 다음 페이지에서 문진 작성이 가능합니다. (단, 개인정보 수집·이용 동의는 필수입니다.)
+        </p>
+
+        <div class="consent-sign">
+          <div class="field">
+            <div class="field-label">작성일 (선택)</div>
+            <input type="date" id="consent_date" />
+          </div>
+          <div class="field">
+            <div class="field-label">성명 (서명 · 선택)</div>
+            <input type="text" id="consent_name" placeholder="선택 사항입니다. 작성 시 서명으로 간주됩니다." />
+          </div>
+        </div>
+      </section>
+
+      <div class="submit-row">
+        <div class="submit-note">
+          ※ 개인정보 수집·이용에 동의하셔야 문진을 진행하실 수 있습니다.<br />
+          (영상·AI 활용 동의는 선택 사항입니다.)
+        </div>
+        <button type="button" class="btn-primary" id="to-page-2">
+          <span>다음 페이지로 이동</span>
+          <span class="icon">→</span>
+        </button>
+      </div>
+    </main>
+  </div>
+
+  <!-- ✅ PAGE 2 : 운동교정 초기 문진표 -->
+  <div class="page hidden" id="page-2">
+    <header class="header">
+      <div class="badge-row">
+        <div class="logo-dot">GM</div>
+        <div class="badge">갓메이드 운동교정 · Initial Intake</div>
+      </div>
+      <h1 class="header-title">📝 <span>운동교정</span> 초기 문진표</h1>
+      <p class="header-subtitle">
+        단, 10분! 당신의 몸이 편안해지는 시간.<br />
+        아래 내용을 바탕으로 <strong>1:1 맞춤 교정 방향</strong>을 설계하니, 편하게 느끼시는 대로 작성해 주세요.
+      </p>
+    </header>
+
+    <main class="card" id="card">
+      <div class="top-note">
+        <div>
+          <strong>작성 소요 시간 약 5~7분</strong><br />
+          최대한 자세히 적어주실수록 첫 상담이 더 수월해집니다.
+        </div>
+        <div class="top-chip">모든 내용은 갓메이드 내부 상담용으로만 사용됩니다.</div>
+      </div>
+
+      <form id="intake-form">
+        <!-- 1. 기본 정보 -->
+        <section class="section">
+          <div class="section-header">
+            <div class="section-title">📌 1. 기본 정보</div>
+            <div class="section-tag">필수 항목</div>
+          </div>
+          <p class="section-desc">연락과 초기 상담을 위해 필요한 최소한의 정보입니다.</p>
+
+          <div class="fields-2">
+            <div class="field">
+              <div class="field-label">
+                이름 <span class="required">필수</span>
+              </div>
+              <input type="text" name="name" placeholder="예) 홍길동" required />
+            </div>
+            <div class="field">
+              <div class="field-label">
+                성별 <span class="required">필수</span>
+              </div>
+              <div class="choice-row">
+                <label class="choice">
+                  <input type="radio" name="gender" value="남" required /> 남
+                </label>
+                <label class="choice">
+                  <input type="radio" name="gender" value="여" /> 여
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="fields-2">
+            <div class="field">
+              <div class="field-label">
+                나이 <span class="required">필수</span>
+              </div>
+              <input type="number" name="age" min="10" max="90" placeholder="만 나이 기준" required />
+            </div>
+            <div class="field">
+              <div class="field-label">
+                연락처 <span class="required">필수</span>
+              </div>
+              <input type="tel" name="phone" placeholder="숫자만 입력" required />
+            </div>
+          </div>
+
+          <div class="fields-2">
+            <div class="field">
+              <div class="field-label">내원일 (예약 예정일)</div>
+              <input type="date" name="visit_date" />
+            </div>
+            <div class="field">
+              <div class="field-label">직업</div>
+              <input type="text" name="job" placeholder="예) 사무직, 디자이너, 자영업 등" />
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="field-label">주 사용 손</div>
+            <div class="choice-row">
+              <label class="choice">
+                <input type="radio" name="hand" value="오른손" /> 오른손
+              </label>
+              <label class="choice">
+                <input type="radio" name="hand" value="왼손" /> 왼손
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. 내원 목적 -->
+        <section class="section">
+          <div class="section-header">
+            <div class="section-title">📌 2. 내원 목적</div>
+            <div class="section-tag">복수 선택 가능</div>
+          </div>
+          <p class="section-desc">어떤 변화가 가장 필요하신지 체크해 주세요.</p>
+
+          <div class="field">
+            <div class="choice-row">
+              <label class="choice">
+                <input type="checkbox" name="purpose" value="통증 해소" /> 통증 해소
+              </label>
+              <label class="choice">
+                <input type="checkbox" name="purpose" value="자세 교정" /> 자세 교정
+              </label>
+              <label class="choice">
+                <input type="checkbox" name="purpose" value="체형 개선" /> 체형 개선
+              </label>
+              <label class="choice">
+                <input type="checkbox" name="purpose" value="운동 능력 향상" /> 운동 능력 향상
+              </label>
+              <label class="choice">
+                <input type="checkbox" name="purpose" value="재활 목적" /> 재활 목적
+              </label>
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="field-label">기타</div>
+            <input type="text" name="purpose_etc" placeholder="직접 적고 싶은 목적이 있다면 자유롭게 적어주세요." />
+          </div>
+        </section>
+
+        <!-- 3. 통증 관련 문진 -->
+        <section class="section">
+          <div class="section-header">
+            <div class="section-title">📌 3. 통증 관련 문진</div>
+            <div class="section-tag">현재 불편한 부위</div>
+          </div>
+          <p class="section-desc">현재 불편함을 구체적으로 적어주실수록 도움이 됩니다.</p>
+
+          <div class="field">
+            <div class="field-label">
+              현재 불편하거나 아픈 부위 <span class="required">가능하면 작성</span>
+            </div>
+            <input type="text" name="pain_area" placeholder="예) 오른쪽 허리, 왼쪽 어깨, 목, 무릎 등" />
+          </div>
+
+          <div class="field">
+            <div class="field-label">통증 강도 (0~10)</div>
+            <div class="pain-scale">
+              <div class="pain-boxes" id="pain-boxes"></div>
+              <div class="pain-value" id="pain-value">0/10</div>
+              <input type="hidden" name="pain_level" id="pain-level-input" value="0" />
+            </div>
+            <div class="helper">0: 전혀 아프지 않음 · 10: 견디기 어려울 정도의 통증</div>
+          </div>
+
+          <div class="field">
+            <div class="field-label">통증 양상 (복수 선택 가능)</div>
+            <div class="choice-row">
+              <label class="choice">
+                <input type="checkbox" name="pain_type" value="뻐근함" /> 뻐근함
+              </label>
+              <label class="choice">
+                <input type="checkbox" name="pain_type" value="찌르는 듯한 통증" /> 찌르는 듯한 통증
+              </label>
+              <label class="choice">
+                <input type="checkbox" name="pain_type" value="저림" /> 저림
+              </label>
+              <label class="choice">
+                <input type="checkbox" name="pain_type" value="뻣뻣함" /> 뻣뻣함
+              </label>
+              <label class="choice">
+                <input type="checkbox" name="pain_type" value="쑤심" /> 쑤심
+              </label>
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="field-label">통증 양상 기타</div>
+            <input type="text" name="pain_type_etc" placeholder="예) 타는 듯한 느낌, 쥐나는 느낌 등" />
+          </div>
+
+          <div class="fields-2">
+            <div class="field">
+              <div class="field-label">통증이 처음 발생한 시기</div>
+              <input type="text" name="pain_onset" placeholder="예) 3개월 전, 1년 전, 최근 1주일 등" />
+            </div>
+            <div class="field">
+              <div class="field-label">하루 중 통증이 가장 심한 시간대</div>
+              <div class="choice-row">
+                <label class="choice">
+                  <input type="radio" name="pain_time" value="아침" /> 아침
+                </label>
+                <label class="choice">
+                  <input type="radio" name="pain_time" value="낮" /> 낮
+                </label>
+                <label class="choice">
+                  <input type="radio" name="pain_time" value="저녁" /> 저녁
+                </label>
+                <label class="choice">
+                  <input type="radio" name="pain_time" value="특정 활동 후" /> 특정 활동 후
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="field-label">통증이 심해지는 상황</div>
+            <input type="text" name="pain_worse" placeholder="예) 오래 앉아 있을 때, 오래 걷거나 뛸 때 등" />
+          </div>
+
+          <div class="field">
+            <div class="field-label">통증이 완화되는 상황</div>
+            <input type="text" name="pain_better" placeholder="예) 누워 있을 때, 스트레칭 후, 약 복용 후 등" />
+          </div>
+        </section>
+
+        <!-- 4. 생활·자세 패턴 -->
+        <section class="section">
+          <div class="section-header">
+            <div class="section-title">📌 4. 생활·자세 패턴 문진</div>
+            <div class="section-tag">생활 습관</div>
+          </div>
+          <p class="section-desc">평소 생활 패턴을 알수록 교정 방향을 더 잘 잡을 수 있습니다.</p>
+
+          <div class="field">
+            <div class="field-label">하루 평균 앉아 있는 시간</div>
+            <div class="choice-row">
+              <label class="choice">
+                <input type="radio" name="sitting" value="3시간 이하" /> 3시간 이하
+              </label>
+              <label class="choice">
+                <input type="radio" name="sitting" value="3~6시간" /> 3~6시간
+              </label>
+              <label class="choice">
+                <input type="radio" name="sitting" value="6~9시간" /> 6~9시간
+              </label>
+              <label class="choice">
+                <input type="radio" name="sitting" value="9시간 이상" /> 9시간 이상
+              </label>
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="field-label">주된 자세 (복수 선택 가능)</div>
+            <div class="choice-row">
+              <label class="choice">
+                <input type="checkbox" name="posture" value="컴퓨터/사무 자세" /> 컴퓨터/사무 자세
+              </label>
+              <label class="choice">
+                <input type="checkbox" name="posture" value="운전" /> 운전
+              </label>
+              <label class="choice">
+                <input type="checkbox" name="posture" value="서서 근무" /> 서서 근무
+              </label>
+              <label class="choice">
+                <input type="checkbox" name="posture" value="반복적 움직임" /> 반복적 움직임
+              </label>
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="field-label">주된 자세 기타</div>
+            <input type="text" name="posture_etc" placeholder="예) 아이 안고 있기, 서서 손님 응대 등" />
+          </div>
+
+          <div class="fields-2">
+            <div class="field">
+              <div class="field-label">수면 시간</div>
+              <input type="number" name="sleep_hours" min="0" max="24" placeholder="평균 수면 시간 (시간)" />
+            </div>
+            <div class="field">
+              <div class="field-label">수면 시 불편함</div>
+              <div class="choice-row">
+                <label class="choice">
+                  <input type="radio" name="sleep_discomfort" value="있음" /> 있음
+                </label>
+                <label class="choice">
+                  <input type="radio" name="sleep_discomfort" value="없음" /> 없음
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="field-label">스트레스 수준</div>
+            <div class="choice-row">
+              <label class="choice">
+                <input type="radio" name="stress" value="낮음" /> 낮음
+              </label>
+              <label class="choice">
+                <input type="radio" name="stress" value="보통" /> 보통
+              </label>
+              <label class="choice">
+                <input type="radio" name="stress" value="높음" /> 높음
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- 5. 운동/활동 수준 -->
+        <section class="section">
+          <div class="section-header">
+            <div class="section-title">📌 5. 운동/활동 수준</div>
+            <div class="section-tag">현재 활동량</div>
+          </div>
+          <p class="section-desc">현재 활동량을 기준으로 무리 없는 교정 강도를 설정합니다.</p>
+
+          <div class="field">
+            <div class="field-label">현재 운동 여부</div>
+            <div class="choice-row">
+              <label class="choice">
+                <input type="radio" name="exercise_now" value="한다" /> 한다
+              </label>
+              <label class="choice">
+                <input type="radio" name="exercise_now" value="안 한다" /> 안 한다
+              </label>
+            </div>
+          </div>
+
+          <div class="fields-2">
+            <div class="field">
+              <div class="field-label">운동 빈도</div>
+              <input type="number" name="exercise_freq" min="0" max="14" placeholder="주당 횟수 (예: 2)" />
+            </div>
+            <div class="field">
+              <div class="field-label">운동 종류</div>
+              <input type="text" name="exercise_type" placeholder="예) 헬스, 요가, 필라테스, 축구 등" />
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="field-label">이전 부상/수술 경험</div>
+            <div class="choice-row">
+              <label class="choice">
+                <input type="radio" name="injury" value="있다" /> 있다
+              </label>
+              <label class="choice">
+                <input type="radio" name="injury" value="없다" /> 없다
+              </label>
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="field-label">있다면 부위/시기</div>
+            <input type="text" name="injury_detail" placeholder="예) 2년 전 오른쪽 발목 인대 파열, 6개월 전 허리 디스크 등" />
+          </div>
+        </section>
+
+        <!-- 6. 골격·체형 자가 진단 -->
+        <section class="section">
+          <div class="section-header">
+            <div class="section-title">📌 6. 골격·체형 관련 자가 진단 (선택)</div>
+          </div>
+          <p class="section-desc">스스로 느끼기에 해당되는 항목이 있다면 체크해 주세요.</p>
+
+          <div class="field">
+            <div class="choice-row">
+              <label class="choice">
+                <input type="checkbox" name="skeleton" value="평발/안짱다리/팔자걸음" /> 평발(안짱다리/팔자걸음 포함)
+              </label>
+              <label class="choice">
+                <input type="checkbox" name="skeleton" value="허리 통증" /> 허리 통증
+              </label>
+              <label class="choice">
+                <input type="checkbox" name="skeleton" value="거북목/일자목" /> 거북목/일자목
+              </label>
+              <label class="choice">
+                <input type="checkbox" name="skeleton" value="굽은 등" /> 굽은 등
+              </label>
+              <label class="choice">
+                <input type="checkbox" name="skeleton" value="골반 비틀림" /> 골반 비틀림
+              </label>
+              <label class="choice">
+                <input type="checkbox" name="skeleton" value="다리 길이 차이 느낌" /> 다리 길이 차이 느낌
+              </label>
+              <label class="choice">
+                <input type="checkbox" name="skeleton" value="어깨 비대칭" /> 어깨 비대칭
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- 7. 목표 설정 -->
+        <section class="section">
+          <div class="section-header">
+            <div class="section-title">📌 7. 목표 설정</div>
+          </div>
+          <p class="section-desc">이번 교정을 통해 가장 이루고 싶은 목표를 적어주세요.</p>
+
+          <div class="field">
+            <div class="choice-row">
+              <label class="choice">
+                <input type="checkbox" name="goal" value="통증 해소" /> 통증 해소
+              </label>
+              <label class="choice">
+                <input type="checkbox" name="goal" value="자세 개선" /> 자세 개선
+              </label>
+              <label class="choice">
+                <input type="checkbox" name="goal" value="체형 변화" /> 체형 변화 (B&A 사진 활용)
+              </label>
+              <label class="choice">
+                <input type="checkbox" name="goal" value="운동 능력 상승" /> 운동 능력 상승
+              </label>
+              <label class="choice">
+                <input type="checkbox" name="goal" value="재활" /> 재활
+              </label>
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="field-label">기타 목표</div>
+            <input type="text" name="goal_etc" placeholder="예) 촬영/행사 전 체형 관리, 허리 부담 없이 일하기 등" />
+          </div>
+        </section>
+
+        <!-- 8. 기타 참고 사항 -->
+        <section class="section">
+          <div class="section-header">
+            <div class="section-title">📌 8. 기타 참고 사항</div>
+          </div>
+          <p class="section-desc">상담자가 꼭 알고 있었으면 하는 내용이 있다면 자유롭게 적어주세요.</p>
+
+          <div class="field">
+            <textarea name="notes" placeholder="예) 특정 질환, 임신 여부, 심리적 부담, 꼭 피하고 싶은 동작 등"></textarea>
+          </div>
+        </section>
+
+        <!-- 네비 + Submit -->
+        <div class="submit-row">
+          <button type="button" class="btn-secondary" id="back-to-page-1">
+            <span class="icon">←</span>
+            <span>이전 페이지</span>
+          </button>
+          <div style="display:flex; flex-direction:column; gap:4px; align-items:flex-end;">
+            <div class="submit-note">
+              ※ 작성해 주신 내용은 <strong>갓메이드 내부 상담</strong>을 위해서만 사용되며,<br />
+              일정 기간 이후 안전하게 파기됩니다.
+            </div>
+            <button type="button" class="btn-primary" id="submit-btn">
+              <span>문진 내용 제출하기</span>
+              <span class="icon">→</span>
+            </button>
+          </div>
+        </div>
+      </form>
+    </main>
+  </div>
+
+  <script>
+    // 페이지 전환 요소
+    const page1 = document.getElementById("page-1");
+    const page2 = document.getElementById("page-2");
+    const toPage2Btn = document.getElementById("to-page-2");
+    const backToPage1Btn = document.getElementById("back-to-page-1");
+
+    // 동의 체크 요소
+    const agreePersonalEl = document.getElementById("agree_personal");
+    const agreeMediaEl = document.getElementById("agree_media");
+    const agreeAiEl = document.getElementById("agree_ai");
+    const consentNameEl = document.getElementById("consent_name");
+    const consentDateEl = document.getElementById("consent_date");
+
+    // 동의 여부와 관계없이, 현재 상태를 저장만 하는 함수
+    function saveConsent() {
+      const consentData = {
+        agree_personal: !!agreePersonalEl.checked,
+        agree_media: !!agreeMediaEl.checked,
+        agree_ai: !!agreeAiEl.checked,
+        consent_name: consentNameEl.value.trim() || null,
+        consent_date: consentDateEl.value || null,
+        createdAt: new Date().toISOString()
+      };
+      localStorage.setItem("gm_consent_latest", JSON.stringify(consentData));
+    }
+
+    toPage2Btn.addEventListener("click", () => {
+      // ✅ 개인정보 동의 필수 체크
+      if (!agreePersonalEl.checked) {
+        alert("개인정보 및 건강정보 수집·이용 동의는 필수입니다.\n동의란에 체크해 주세요.");
+        return;
+      }
+
+      // 선택적으로 입력된 동의 상태 저장
+      saveConsent();
+
+      page1.classList.add("hidden");
+      page2.classList.remove("hidden");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    backToPage1Btn.addEventListener("click", () => {
+      page2.classList.add("hidden");
+      page1.classList.remove("hidden");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    // ============================
+    // 문진 페이지 JS (통증강도 + 저장)
+    // ============================
+    const painBoxesContainer = document.getElementById("pain-boxes");
+    const painValueEl = document.getElementById("pain-value");
+    const painLevelInput = document.getElementById("pain-level-input");
+
+    for (let i = 0; i <= 10; i++) {
+      const box = document.createElement("div");
+      box.className = "pain-box";
+      box.dataset.value = i;
+      box.title = i;
+      box.addEventListener("click", () => {
+        const value = Number(box.dataset.value);
+        painLevelInput.value = value;
+        painValueEl.textContent = value + "/10";
+
+        document.querySelectorAll(".pain-box").forEach((b) => {
+          const v = Number(b.dataset.value);
+          if (v <= value && value !== 0) {
+            b.classList.add("active");
+          } else {
+            b.classList.remove("active");
+          }
+        });
+      });
+      painBoxesContainer.appendChild(box);
+    }
+
+    const form = document.getElementById("intake-form");
+    const submitBtn = document.getElementById("submit-btn");
+    const card = document.getElementById("card");
+
+    function getCheckedValues(name) {
+      return Array.from(form.querySelectorAll(`input[name="${name}"]:checked`)).map(
+        (el) => el.value
+      );
+    }
+
+    function validateForm() {
+      const name = form.elements["name"].value.trim();
+      const age = form.elements["age"].value.trim();
+      const phone = form.elements["phone"].value.trim();
+      const genderChecked = form.querySelector('input[name="gender"]:checked');
+
+      if (!name || !age || !phone || !genderChecked) {
+        alert("이름, 성별, 나이, 연락처는 필수로 작성해 주세요.");
+        return false;
+      }
+      return true;
+    }
+
+    function saveSubmission() {
+      const data = {};
+      const formData = new FormData(form);
+
+      formData.forEach((value, key) => {
+        if (data[key]) {
+          if (!Array.isArray(data[key])) {
+            data[key] = [data[key]];
+          }
+          data[key].push(value);
+        } else {
+          data[key] = value;
+        }
+      });
+
+      // 다중 선택 항목
+      data.purposes = getCheckedValues("purpose");
+      data.pain_types = getCheckedValues("pain_type");
+      data.postures = getCheckedValues("posture");
+      data.skeleton_issues = getCheckedValues("skeleton");
+      data.goals = getCheckedValues("goal");
+
+      // admin.html에서 area 통계를 위해 skeleton을 areas로도 저장
+      data.areas = data.skeleton_issues || [];
+
+      // 최신 동의서 정보(있다면) 같이 묶어서 저장
+      const consentRaw = localStorage.getItem("gm_consent_latest");
+      if (consentRaw) {
+        try {
+          const consent = JSON.parse(consentRaw);
+          data.consent = consent;
+        } catch (e) {
+          console.error("동의서 파싱 오류:", e);
+        }
+      }
+
+      // 시간
+      data.createdAt = new Date().toISOString();
+
+      const existingRaw = localStorage.getItem("gm_posture_submissions");
+      const existing = existingRaw ? JSON.parse(existingRaw) : [];
+      existing.push(data);
+      localStorage.setItem("gm_posture_submissions", JSON.stringify(existing));
+    }
+
+    submitBtn.addEventListener("click", () => {
+      if (!validateForm()) return;
+
+      saveSubmission();
+
+      card.innerHTML = `
+        <div class="success">
+          <div class="success-icon">✓</div>
+          <div class="success-title">문진이 정상적으로 제출되었습니다</div>
+          <div class="success-text">
+            남겨주신 내용을 바탕으로 <span>갓메이드 선생님</span>이<br />
+            첫 방문 시 더 정확한 교정을 준비하겠습니다.
+          </div>
+          <div class="success-footer">
+            • 추가로 수정하고 싶은 내용이 있다면, 다시 문진을 작성해도 괜찮아요.<br />
+            • 직원용 관리 페이지에서 문진 내역을 확인하려면
+            <a class="admin-link" href="admin.html">admin.html</a>을 열어주세요.
+          </div>
+        </div>
+      `;
+    });
+  </script>
+</body>
+</html>
