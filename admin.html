@@ -475,7 +475,7 @@
       margin-top: 4px;
     }
 
-    /* 로그인 OVERLAY */
+    /* LOGIN OVERLAY */
     .login-backdrop {
       position: fixed;
       inset: 0;
@@ -865,14 +865,11 @@
     </div>
   </div>
 
-  <!-- ===========================
-       JS 전체 스크립트
-  ============================ -->
   <script>
     // ====== 설정 ======
     const ADMIN_PASSWORD = "godmade2024!"; // ★ 원하는 기본 비번
     const GOOGLE_SHEETS_WEBAPP_URL =
-      "https://script.google.com/macros/s/AKfycbym3DEdwLahkLdPVMVUe4Fzoi7SS_R6Xu8c7_wKp4wsivbMtn8i_KcivI91TsyuxBGQBQ/exec";
+      "https://script.google.com/macros/s/AKfycbynHi_DfiJhDe6BD9o5hVlz9VKsEuCzQO9AcJKIpn-2hiItqStvTbxOkaA9ICdT6UlTCA/exec"; // ★ 새 웹앱 URL
     const PAGE_SIZE = 15;
 
     let allData = [];
@@ -1048,9 +1045,10 @@
       const last = allData[0];
       const created = last.createdAt ? new Date(last.createdAt) : null;
       if (created && !isNaN(created)) {
-        const d = `${created.getFullYear()}-${String(
-          created.getMonth() + 1
-        ).padStart(2, "0")}-${String(created.getDate()).padStart(2, "0")}`;
+        const d = `${created.getFullYear()}-${String(created.getMonth() + 1).padStart(
+          2,
+          "0"
+        )}-${String(created.getDate()).padStart(2, "0")}`;
         lastEl.textContent = "최근 작성: " + d;
       } else {
         lastEl.textContent = "최근 작성: -";
@@ -1100,8 +1098,7 @@
       });
 
       purposeEl.textContent = topPurpose;
-      purposeExtraEl.textContent =
-        topPurpose === "-" ? "" : `총 ${maxCnt}명이 선택`;
+      purposeExtraEl.textContent = topPurpose === "-" ? "" : `총 ${maxCnt}명이 선택`;
     }
 
     // ====== 필터 / 검색 ======
@@ -1110,9 +1107,7 @@
       const fromStr = dateFromInput.value;
       const toStr = dateToInput.value;
 
-      const fromTime = fromStr
-        ? new Date(fromStr + "T00:00:00").getTime()
-        : null;
+      const fromTime = fromStr ? new Date(fromStr + "T00:00:00").getTime() : null;
       const toTime = toStr ? new Date(toStr + "T23:59:59").getTime() : null;
 
       filteredData = allData.filter((d) => {
@@ -1221,12 +1216,10 @@
         const created = d.createdAt ? new Date(d.createdAt) : null;
         const createdStr =
           created && !isNaN(created)
-            ? `${created.getFullYear()}-${String(
-                created.getMonth() + 1
-              ).padStart(2, "0")}-${String(created.getDate()).padStart(
+            ? `${created.getFullYear()}-${String(created.getMonth() + 1).padStart(
                 2,
                 "0"
-              )}`
+              )}-${String(created.getDate()).padStart(2, "0")}`
             : "-";
 
         const tags = normalizeMulti(d.tags);
@@ -1241,7 +1234,11 @@
               ? `<span class="pill">${escapeHtml(mainPurpose)}</span>`
               : "-"
           }</td>
-          <td>${d.pain_level !== undefined ? d.pain_level + "/10" : "-"}</td>
+          <td>${
+            d.pain_level !== undefined && d.pain_level !== null
+              ? d.pain_level + "/10"
+              : "-"
+          }</td>
           <td>${createdStr}</td>
           <td>${
             tags.length
@@ -1290,14 +1287,12 @@
       const created = d.createdAt ? new Date(d.createdAt) : null;
       const createdStr =
         created && !isNaN(created)
-          ? `${created.getFullYear()}-${String(
-              created.getMonth() + 1
-            ).padStart(2, "0")}-${String(
-              created.getDate()
-            ).padStart(2, "0")} ${String(created.getHours()).padStart(
+          ? `${created.getFullYear()}-${String(created.getMonth() + 1).padStart(
               2,
               "0"
-            )}:${String(created.getMinutes()).padStart(2, "0")}`
+            )}-${String(created.getDate()).padStart(2, "0")} ${String(
+              created.getHours()
+            ).padStart(2, "0")}:${String(created.getMinutes()).padStart(2, "0")}`
           : "-";
 
       detailMetaEl.textContent = `${d.phone || "-"} · 작성일 ${createdStr}`;
@@ -1366,7 +1361,11 @@
           </div>
           <div class="modal-row">
             <span class="modal-label">통증 강도</span><br/>
-            ${d.pain_level !== undefined ? d.pain_level + "/10" : "-"}
+            ${
+              d.pain_level !== undefined && d.pain_level !== null
+                ? d.pain_level + "/10"
+                : "-"
+            }
           </div>
           <div class="modal-row">
             <span class="modal-label">통증 양상</span><br/>
@@ -1675,7 +1674,7 @@
       });
     }
 
-    // ====== CSV EXPORT ======>
+    // ====== CSV EXPORT ======
     function exportCSV() {
       if (!allData.length) {
         alert("내보낼 문진 데이터가 없습니다.");
@@ -1730,15 +1729,9 @@
             let v = "";
 
             if (h === "consent_name") {
-              v =
-                d.consent && d.consent.consent_name
-                  ? d.consent.consent_name
-                  : "";
+              v = d.consent && d.consent.consent_name ? d.consent.consent_name : "";
             } else if (h === "consent_date") {
-              v =
-                d.consent && d.consent.consent_date
-                  ? d.consent.consent_date
-                  : "";
+              v = d.consent && d.consent.consent_date ? d.consent.consent_date : "";
             } else if (h === "agree_personal") {
               v = d.consent && d.consent.agree_personal ? "동의" : "미동의";
             } else if (h === "agree_media") {
@@ -1784,22 +1777,33 @@
       if (!ok) return;
 
       try {
-        const payload = { entries: allData };
-
-        // 🔥 CORS 문제 회피: no-cors, 응답을 읽지 않고 요청만 보냄
-        await fetch(GOOGLE_SHEETS_WEBAPP_URL, {
+        const res = await fetch(GOOGLE_SHEETS_WEBAPP_URL, {
           method: "POST",
-          mode: "no-cors",
-          body: JSON.stringify(payload)
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ entries: allData })
         });
 
-        alert(
-          "구글 시트로 동기화 요청을 보냈습니다.\n\n실제 저장 여부는 구글 시트와 Apps Script 실행 로그에서 확인해 주세요."
-        );
+        const text = await res.text();
+        let json;
+        try {
+          json = JSON.parse(text);
+        } catch (e) {
+          console.error("응답 JSON 파싱 실패:", text);
+        }
+
+        if (!res.ok || !json || json.ok === false) {
+          console.error("응답 상태:", res.status, text);
+          alert(
+            "구글 시트 동기화 중 오류가 발생했습니다.\n실제 저장 여부는 구글 Apps Script 로그에서 확인해 주세요."
+          );
+          return;
+        }
+
+        alert("구글 시트로 동기화 요청을 전송했습니다.\n시트에서 [원본데이터] 탭을 확인해 주세요.");
       } catch (e) {
-        console.error("Fetch error:", e);
+        console.error(e);
         alert(
-          "구글 시트 동기화 중 네트워크 오류가 발생했습니다.\n자세한 내용은 개발자 도구(Console)를 확인해 주세요."
+          "구글 시트 동기화 중 오류가 발생했습니다. 브라우저 콘솔(Console) 로그를 확인해 주세요."
         );
       }
     }
