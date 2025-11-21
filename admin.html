@@ -1,0 +1,1838 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>갓메이드 문진 데이터 관리자 페이지</title>
+
+  <!-- 증상 그래프용 Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root {
+      --primary: #2563eb;
+      --accent: #22c55e;
+      --bg: #f3f4f6;
+      --card-bg: #ffffff;
+      --text-main: #111827;
+      --text-sub: #6b7280;
+      --border: #e5e7eb;
+      --radius-xl: 18px;
+      --radius-md: 12px;
+      --shadow-soft: 0 18px 40px rgba(15, 23, 42, 0.08);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Pretendard", system-ui, sans-serif;
+      background: #f3f4f6;
+      color: var(--text-main);
+      padding: 32px 16px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 1150px;
+    }
+
+    /* HEADER */
+    .header {
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .badge-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .logo-dot {
+      width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      background: conic-gradient(from 140deg, #22c55e, #2563eb, #a855f7, #22c55e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 0.78rem;
+      font-weight: 700;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.45);
+    }
+
+    .badge {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #e0ebff;
+      color: #1d4ed8;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .title {
+      font-size: 1.6rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      font-size: 0.9rem;
+      color: var(--text-sub);
+    }
+
+    .header-right {
+      text-align: right;
+      font-size: 0.8rem;
+      color: var(--text-sub);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: flex-end;
+    }
+
+    .header-right > div {
+      text-align: right;
+    }
+
+    /* CARD */
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius-xl);
+      padding: 18px 18px 16px;
+      box-shadow: var(--shadow-soft);
+      margin-bottom: 18px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .card-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-sub);
+      margin-bottom: 10px;
+    }
+
+    /* STATS */
+    .stats {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .stat-box {
+      flex: 1;
+      min-width: 180px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--text-sub);
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .stat-extra {
+      margin-top: 3px;
+      font-size: 0.75rem;
+      color: #9ca3af;
+    }
+
+    .muted {
+      color: var(--text-sub);
+      font-size: 0.8rem;
+    }
+
+    /* FILTERS & SEARCH */
+    .filters-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+      align-items: center;
+    }
+
+    .search-box {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .search-box input,
+    .filter-input {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      font-size: 0.82rem;
+      background: #ffffff;
+    }
+
+    .filter-label {
+      font-size: 0.75rem;
+      color: var(--text-sub);
+      margin-bottom: 2px;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 140px;
+    }
+
+    .btn {
+      padding: 7px 13px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(90deg, #2563eb, #22c55e);
+      color: #ffffff;
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.45);
+    }
+
+    .btn-outline {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      color: #374151;
+    }
+
+    .btn-danger {
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
+    }
+
+    .btn-sm {
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      box-shadow: none;
+    }
+
+    /* LAYOUT grid */
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.7fr) minmax(0, 1.1fr);
+      gap: 14px;
+    }
+
+    @media (max-width: 900px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* TABLE */
+    .table-container {
+      border-radius: 16px;
+      border: 1px solid #e5e7eb;
+      overflow: hidden;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+    }
+
+    thead {
+      background: #f1f5f9;
+    }
+
+    th, td {
+      padding: 9px 8px;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    th {
+      font-weight: 600;
+      color: #374151;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    th.sortable::after {
+      content: "⇅";
+      font-size: 0.7rem;
+      margin-left: 4px;
+      color: #9ca3af;
+    }
+
+    tr:hover {
+      background: #f9fafb;
+    }
+
+    td { vertical-align: top; }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 2px 7px;
+      font-size: 0.72rem;
+      background: #eff6ff;
+      color: #1d4ed8;
+      margin: 1px 3px 1px 0;
+    }
+
+    .pill-tag {
+      background: #fef9c3;
+      color: #92400e;
+      border: 1px solid #facc15;
+    }
+
+    .tag-remove {
+      margin-left: 4px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-size: 0.8rem;
+      color: #92400e;
+    }
+
+    /* PAGINATION */
+    .pagination {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 6px 8px;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .page-btn {
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid #e5e7eb;
+      background: #ffffff;
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+
+    .page-btn[disabled] {
+      opacity: 0.5;
+      cursor: default;
+    }
+
+    .page-info {
+      font-size: 0.78rem;
+      color: #4b5563;
+    }
+
+    /* GRAPH */
+    .graph-card {
+      border-radius: 16px;
+      border: 1px solid #e5e7eb;
+      padding: 10px 10px 8px;
+      background: #f9fafb;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .graph-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .graph-subtitle {
+      font-size: 0.75rem;
+      color: var(--text-sub);
+      margin-bottom: 6px;
+    }
+
+    .graph-wrapper {
+      flex: 1;
+      min-height: 220px;
+    }
+
+    .footer-actions {
+      margin-top: 6px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* DUPLICATE CARD */
+    .dup-card table {
+      border-radius: 0;
+      border: none;
+    }
+
+    /* MODAL (DETAIL) */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+
+    .modal-backdrop.active {
+      display: flex;
+    }
+
+    .modal {
+      background: #ffffff;
+      border-radius: 18px;
+      max-width: 720px;
+      width: 100%;
+      max-height: 90vh;
+      overflow: auto;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.35);
+      padding: 16px 18px 14px;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .modal-title {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .modal-meta {
+      font-size: 0.78rem;
+      color: var(--text-sub);
+    }
+
+    .modal-close {
+      border: none;
+      background: #e5e7eb;
+      border-radius: 999px;
+      width: 26px;
+      height: 26px;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .modal-section {
+      border-radius: 14px;
+      border: 1px solid #e5e7eb;
+      background: #f9fafb;
+      padding: 8px 9px;
+      margin-bottom: 8px;
+      font-size: 0.8rem;
+    }
+
+    .modal-section-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .modal-row {
+      margin-bottom: 2px;
+    }
+
+    .modal-label {
+      color: #6b7280;
+    }
+
+    .modal-note {
+      font-size: 0.76rem;
+      color: #9ca3af;
+      margin-top: 4px;
+    }
+
+    /* LOGIN OVERLAY */
+    .login-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+
+    .login-card {
+      background: #f9fafb;
+      border-radius: 18px;
+      padding: 20px 18px 18px;
+      max-width: 360px;
+      width: 100%;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.5);
+      border: 1px solid #e5e7eb;
+    }
+
+    .login-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .login-sub {
+      font-size: 0.8rem;
+      color: #6b7280;
+      margin-bottom: 12px;
+    }
+
+    .login-input {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid #e5e7eb;
+      font-size: 0.84rem;
+      margin-bottom: 10px;
+    }
+
+    .login-hint {
+      font-size: 0.74rem;
+      color: #9ca3af;
+      margin-top: 4px;
+    }
+
+    .login-remember {
+      font-size: 0.78rem;
+      color: #4b5563;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+
+    /* PASSWORD CHANGE MODAL */
+    .pw-modal-card {
+      background: #f9fafb;
+      border-radius: 18px;
+      padding: 18px 18px 16px;
+      max-width: 360px;
+      width: 100%;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.5);
+      border: 1px solid #e5e7eb;
+    }
+
+    .pw-label {
+      font-size: 0.8rem;
+      color: #4b5563;
+      margin-bottom: 4px;
+    }
+
+    .pw-input {
+      width: 100%;
+      padding: 7px 9px;
+      border-radius: 10px;
+      border: 1px solid #e5e7eb;
+      font-size: 0.82rem;
+      margin-bottom: 8px;
+    }
+
+    .pw-hint {
+      font-size: 0.74rem;
+      color: #9ca3af;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 로그인 오버레이 -->
+  <div class="login-backdrop" id="login-backdrop">
+    <div class="login-card">
+      <div class="badge-row" style="margin-bottom:6px;">
+        <div class="logo-dot">GM</div>
+        <div class="badge">갓메이드 Admin 로그인</div>
+      </div>
+      <div class="login-title">관리자 전용 페이지</div>
+      <div class="login-sub">
+        문진 데이터는 민감 정보일 수 있어요.<br />
+        관리자 비밀번호를 입력하고 대시보드를 열어주세요.
+      </div>
+      <input
+        type="password"
+        id="admin-password-input"
+        class="login-input"
+        placeholder="관리자 비밀번호를 입력하세요"
+      />
+      <label class="login-remember">
+        <input type="checkbox" id="remember-login" />
+        이 브라우저에서 로그인 상태 유지
+      </label>
+      <button class="btn btn-primary" type="button" onclick="attemptLogin()" style="width:100%; justify-content:center;">
+        로그인
+      </button>
+      <div class="login-hint">
+        최초 기본 비밀번호는 코드 상단 <code>ADMIN_PASSWORD</code> 값입니다.
+      </div>
+    </div>
+  </div>
+
+  <!-- 비밀번호 변경 모달 -->
+  <div class="modal-backdrop" id="pw-backdrop">
+    <div class="pw-modal-card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <div class="login-title" style="font-size:1rem;">비밀번호 설정</div>
+        <button class="modal-close" type="button" onclick="closePwModal()">✕</button>
+      </div>
+      <div class="login-sub" style="margin-bottom:10px;">
+        현재 비밀번호 확인 후 새 비밀번호를 설정합니다.
+      </div>
+      <div>
+        <div class="pw-label">현재 비밀번호</div>
+        <input type="password" id="pw-current" class="pw-input" />
+      </div>
+      <div>
+        <div class="pw-label">새 비밀번호</div>
+        <input type="password" id="pw-new" class="pw-input" />
+      </div>
+      <div>
+        <div class="pw-label">새 비밀번호 확인</div>
+        <input type="password" id="pw-confirm" class="pw-input" />
+      </div>
+      <button class="btn btn-primary" type="button" style="width:100%; justify-content:center; margin-top:4px;" onclick="changePassword()">
+        비밀번호 변경
+      </button>
+      <div class="pw-hint">
+        이 브라우저의 localStorage에만 저장되며, 기본값은 ADMIN_PASSWORD입니다.
+      </div>
+    </div>
+  </div>
+
+  <!-- 고급 옵션 모달 -->
+  <div class="modal-backdrop" id="settings-backdrop">
+    <div class="pw-modal-card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <div class="login-title" style="font-size:1rem;">고급 옵션</div>
+        <button class="modal-close" type="button" onclick="closeSettingsModal()">✕</button>
+      </div>
+      <div class="login-sub" style="margin-bottom:10px;">
+        아래 기능은 되돌릴 수 없거나, 데이터에 큰 영향을 줄 수 있습니다.<br />
+        꼭 필요할 때만 신중하게 사용해 주세요.
+      </div>
+
+      <div style="border-radius:12px; border:1px solid #fecaca; background:#fef2f2; padding:10px 10px 8px; margin-bottom:10px;">
+        <div style="font-size:0.9rem; font-weight:600; color:#b91c1c; margin-bottom:4px;">
+          ⚠ 전체 문진 데이터 삭제
+        </div>
+        <div style="font-size:0.78rem; color:#7f1d1d; margin-bottom:6px;">
+          이 브라우저의 <strong>localStorage에 저장된 모든 문진/동의서 데이터가 삭제</strong>됩니다.<br />
+          GitHub Pages·도메인 기준으로 저장된 데이터만 영향을 받으며, 되돌릴 수 없습니다.
+        </div>
+        <button class="btn btn-danger btn-sm" type="button" onclick="handleClearData()">
+          전체 데이터 영구 삭제
+        </button>
+      </div>
+
+      <div class="pw-hint">
+        ※ 이미 구글 시트 등 외부로 동기화된 데이터는 삭제되지 않습니다.
+      </div>
+    </div>
+  </div>
+
+  <div class="page">
+    <!-- HEADER -->
+    <header class="header">
+      <div>
+        <div class="badge-row">
+          <div class="logo-dot">GM</div>
+          <div class="badge">갓메이드 운동교정 · Admin Dashboard</div>
+        </div>
+        <div class="title">📊 문진 데이터 관리자 페이지</div>
+        <div class="subtitle">
+          index.html에서 작성된 <strong>동의서 + 초기 문진</strong> 데이터를 한 곳에서 관리합니다.
+        </div>
+      </div>
+      <div class="header-right">
+        <div>동일 브라우저 기준 <strong>localStorage</strong> 저장</div>
+        <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end;">
+          <button class="btn btn-outline btn-sm" type="button" onclick="location.href='index.html'">
+            회원용 문진 페이지
+          </button>
+          <button class="btn btn-outline btn-sm" type="button" onclick="openPwModal()">
+            비밀번호 설정
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- STATS + FILTERS + GRAPH -->
+    <section class="card">
+      <div class="card-title">📈 전체 통계 & 필터</div>
+      <div class="card-subtitle">
+        index.html에서 수집된 문진 데이터를 불러와 요약 통계, 검색, 필터, 정렬을 할 수 있습니다.
+      </div>
+
+      <!-- 통계 -->
+      <div class="stats" id="stats-row">
+        <div class="stat-box">
+          <div class="stat-label">총 문진 개수</div>
+          <div class="stat-value" id="stat-total">0</div>
+          <div class="stat-extra" id="stat-last">최근 작성: -</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">평균 통증 강도 (0~10)</div>
+          <div class="stat-value" id="stat-pain">0.0</div>
+          <div class="stat-extra" id="stat-pain-extra">데이터 없음</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">가장 많은 내원 목적</div>
+          <div class="stat-value" id="stat-purpose">-</div>
+          <div class="stat-extra" id="stat-purpose-extra"></div>
+        </div>
+      </div>
+
+      <!-- 필터/검색 -->
+      <div class="filters-row" style="margin-top: 12px;">
+        <div class="search-box">
+          <div class="filter-label">검색 (이름, 연락처, 통증부위, 태그 등)</div>
+          <input id="search-input" type="text" placeholder="예: 허리, 홍길동, 010, 재등록유력 등" />
+        </div>
+
+        <div class="filter-group">
+          <div class="filter-label">시작일</div>
+          <input id="date-from" class="filter-input" type="date" />
+        </div>
+
+        <div class="filter-group">
+          <div class="filter-label">종료일</div>
+          <input id="date-to" class="filter-input" type="date" />
+        </div>
+
+        <div class="filter-group" style="min-width: 150px;">
+          <div class="filter-label">빠른 액션</div>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button class="btn btn-outline btn-sm" type="button" onclick="resetFilters()">필터 초기화</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 그래프 + 테이블 -->
+      <div class="grid">
+        <!-- 테이블 -->
+        <div class="table-container">
+          <table id="data-table">
+            <thead>
+              <tr>
+                <th class="sortable" data-key="name">이름</th>
+                <th class="sortable" data-key="phone">연락처</th>
+                <th class="sortable" data-key="age">나이</th>
+                <th class="sortable" data-key="gender">성별</th>
+                <th>주요 내원 목적</th>
+                <th class="sortable" data-key="pain_level">통증 강도</th>
+                <th class="sortable" data-key="createdAt">작성 날짜</th>
+                <th>태그</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <div class="muted" id="no-data" style="padding:8px; display:none;">
+            아직 문진 데이터가 없거나, 필터 조건에 맞는 데이터가 없습니다.
+          </div>
+          <div class="pagination" id="pagination">
+            <button class="page-btn" type="button" onclick="changePage('prev')">이전</button>
+            <span class="page-info" id="page-info">페이지 1 / 1</span>
+            <button class="page-btn" type="button" onclick="changePage('next')">다음</button>
+          </div>
+        </div>
+
+        <!-- 그래프 -->
+        <div class="graph-card">
+          <div class="graph-title">📊 통증 양상 분포</div>
+          <div class="graph-subtitle">
+            index.html 문진에서 선택된 통증 양상(pain_type) 데이터를 기반으로 합니다.
+          </div>
+          <div class="graph-wrapper">
+            <canvas id="symptomChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- 아래 버튼 -->
+      <div class="footer-actions">
+        <button class="btn btn-outline" type="button" onclick="exportCSV()">
+          ⬇ CSV로 내보내기
+        </button>
+        <button class="btn btn-primary" type="button" onclick="syncAllToGoogleSheets()">
+          🔄 구글 시트로 전체 동기화
+        </button>
+        <button class="btn btn-outline btn-sm" type="button" onclick="openSettingsModal()">
+          ⚙ 고급 옵션
+        </button>
+      </div>
+    </section>
+
+    <!-- 중복 내원자 요약 -->
+    <section class="card dup-card">
+      <div class="card-title">👥 중복 내원자 요약 (이름 + 연락처 기준)</div>
+      <div class="card-subtitle">
+        같은 이름과 연락처로 2회 이상 문진한 회원들을 모아 보여줍니다. 재등록/장기 케이스 관리에 활용해 보세요.
+      </div>
+      <div class="table-container" style="border:none; box-shadow:none;">
+        <table id="duplicate-table">
+          <thead>
+            <tr>
+              <th>이름</th>
+              <th>연락처</th>
+              <th>문진 횟수</th>
+              <th>마지막 문진일</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <div class="muted" id="no-duplicate" style="padding:8px; display:none;">
+          아직 중복 내원자로 분류된 회원이 없습니다.
+        </div>
+      </div>
+    </section>
+
+    <!-- 동의서 현황 카드 -->
+    <section class="card">
+      <div class="card-title">📄 동의서 현황</div>
+      <div class="card-subtitle">
+        각 문진에 연결된 동의서 정보를 함께 저장해 둔 내용입니다.<br />
+        누가 개인정보·영상·AI 활용에 동의했는지 한눈에 확인할 수 있습니다.
+      </div>
+      <div class="table-container" style="border:none; box-shadow:none;">
+        <table id="consent-table">
+          <thead>
+            <tr>
+              <th>이름 (문진)</th>
+              <th>연락처</th>
+              <th>동의서 이름(서명)</th>
+              <th>동의서 작성일</th>
+              <th>개인정보</th>
+              <th>영상·사진</th>
+              <th>AI/연구</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <div class="muted" id="no-consent" style="padding:8px; display:none;">
+          아직 동의서가 문진과 함께 저장된 데이터가 없습니다.
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- 상세 보기 모달 -->
+  <div class="modal-backdrop" id="detail-backdrop">
+    <div class="modal">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title" id="detail-title">상세 문진 내용</div>
+          <div class="modal-meta" id="detail-meta">-</div>
+        </div>
+        <button class="modal-close" type="button" onclick="closeDetail()">✕</button>
+      </div>
+
+      <div id="detail-body"></div>
+
+      <div class="modal-note">
+        이 화면은 상담 시 참고용입니다. 중요한 회원의 경우, 내용을 엑셀/노션에 복사하고
+        <strong>태그 기능</strong>으로 재등록/관리 우선순위를 표시해두면 좋아요.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ====== 설정 ======
+    const ADMIN_PASSWORD = "godmade2024!"; // ★ 원하는 기본 비번
+    const GOOGLE_SHEETS_WEBAPP_URL =
+      "https://script.google.com/macros/s/AKfycbynHi_DfiJhDe6BD9o5hVlz9VKsEuCzQO9AcJKIpn-2hiItqStvTbxOkaA9ICdT6UlTCA/exec"; // ★ 웹앱 URL
+    const PAGE_SIZE = 15;
+
+    let allData = [];
+    let filteredData = [];
+    let currentSortKey = null;
+    let currentSortDir = "asc";
+    let symptomChart = null;
+    let currentPage = 1;
+    let currentDetailEntry = null;
+
+    const tableBody = document.querySelector("#data-table tbody");
+    const searchInput = document.getElementById("search-input");
+    const dateFromInput = document.getElementById("date-from");
+    const dateToInput = document.getElementById("date-to");
+    const noDataEl = document.getElementById("no-data");
+    const paginationEl = document.getElementById("pagination");
+    const pageInfoEl = document.getElementById("page-info");
+
+    const loginBackdrop = document.getElementById("login-backdrop");
+    const passwordInput = document.getElementById("admin-password-input");
+    const rememberCheckbox = document.getElementById("remember-login");
+    const pwBackdrop = document.getElementById("pw-backdrop");
+    const settingsBackdrop = document.getElementById("settings-backdrop");
+
+    // ====== 비밀번호 / 로그인 ======
+    function getCurrentPassword() {
+      return localStorage.getItem("gm_admin_password") || ADMIN_PASSWORD;
+    }
+
+    function attemptLogin() {
+      const val = passwordInput.value;
+      if (!val) {
+        alert("비밀번호를 입력해 주세요.");
+        return;
+      }
+      if (val !== getCurrentPassword()) {
+        alert("비밀번호가 올바르지 않습니다.");
+        return;
+      }
+
+      if (rememberCheckbox.checked) {
+        localStorage.setItem("gm_admin_logged_in", "true");
+      }
+      loginBackdrop.style.display = "none";
+      initDashboard();
+    }
+
+    passwordInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") attemptLogin();
+    });
+
+    function openPwModal() {
+      pwBackdrop.classList.add("active");
+      document.getElementById("pw-current").value = "";
+      document.getElementById("pw-new").value = "";
+      document.getElementById("pw-confirm").value = "";
+    }
+
+    function closePwModal() {
+      pwBackdrop.classList.remove("active");
+    }
+
+    pwBackdrop.addEventListener("click", (e) => {
+      if (e.target === pwBackdrop) closePwModal();
+    });
+
+    function changePassword() {
+      const current = document.getElementById("pw-current").value;
+      const newPw = document.getElementById("pw-new").value;
+      const confirmPw = document.getElementById("pw-confirm").value;
+
+      if (current !== getCurrentPassword()) {
+        alert("현재 비밀번호가 올바르지 않습니다.");
+        return;
+      }
+      if (!newPw) {
+        alert("새 비밀번호를 입력해주세요.");
+        return;
+      }
+      if (newPw !== confirmPw) {
+        alert("새 비밀번호와 확인 비밀번호가 일치하지 않습니다.");
+        return;
+      }
+
+      localStorage.setItem("gm_admin_password", newPw);
+      alert("비밀번호가 변경되었습니다. 다음 로그인부터 새 비밀번호를 사용해주세요.");
+      closePwModal();
+    }
+
+    // 고급 옵션 모달
+    function openSettingsModal() {
+      settingsBackdrop.classList.add("active");
+    }
+
+    function closeSettingsModal() {
+      settingsBackdrop.classList.remove("active");
+    }
+
+    settingsBackdrop.addEventListener("click", (e) => {
+      if (e.target === settingsBackdrop) closeSettingsModal();
+    });
+
+    // 삭제를 한 번 더 감싼 함수
+    function handleClearData() {
+      const ok = confirm(
+        "정말로 이 브라우저에 저장된 모든 문진/동의서 데이터를 삭제하시겠습니까?\n되돌릴 수 없습니다."
+      );
+      if (!ok) return;
+      clearData();
+      closeSettingsModal();
+    }
+
+    // 페이지 열릴 때 자동 로그인 체크
+    (function checkLogin() {
+      const remembered = localStorage.getItem("gm_admin_logged_in") === "true";
+      if (remembered) {
+        loginBackdrop.style.display = "none";
+        initDashboard();
+      } else {
+        loginBackdrop.style.display = "flex";
+      }
+    })();
+
+    function initDashboard() {
+      loadData();
+    }
+
+    // ====== 데이터 로드 / 통계 ======
+    function loadData() {
+      const raw = localStorage.getItem("gm_posture_submissions");
+      allData = raw ? JSON.parse(raw) : [];
+
+      // 최신 순 정렬
+      allData.sort((a, b) => {
+        const ta = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const tb = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return tb - ta;
+      });
+
+      filteredData = [...allData];
+      currentPage = 1;
+
+      updateStats();
+      updateChart();
+      renderTable();
+      updateDuplicates();
+      updateConsentTable();
+    }
+
+    function saveAllData() {
+      localStorage.setItem("gm_posture_submissions", JSON.stringify(allData));
+    }
+
+    function updateStats() {
+      const totalEl = document.getElementById("stat-total");
+      const lastEl = document.getElementById("stat-last");
+      const painEl = document.getElementById("stat-pain");
+      const painExtraEl = document.getElementById("stat-pain-extra");
+      const purposeEl = document.getElementById("stat-purpose");
+      const purposeExtraEl = document.getElementById("stat-purpose-extra");
+
+      const total = allData.length;
+      totalEl.textContent = total;
+
+      if (!total) {
+        lastEl.textContent = "최근 작성: -";
+        painEl.textContent = "0.0";
+        painExtraEl.textContent = "데이터 없음";
+        purposeEl.textContent = "-";
+        purposeExtraEl.textContent = "";
+        return;
+      }
+
+      const last = allData[0];
+      const created = last.createdAt ? new Date(last.createdAt) : null;
+      if (created && !isNaN(created)) {
+        const d = `${created.getFullYear()}-${String(
+          created.getMonth() + 1
+        ).padStart(2, "0")}-${String(created.getDate()).padStart(2, "0")}`;
+        lastEl.textContent = "최근 작성: " + d;
+      } else {
+        lastEl.textContent = "최근 작성: -";
+      }
+
+      let sum = 0;
+      let cnt = 0;
+      allData.forEach((d) => {
+        const n = Number(d.pain_level || d["pain_level"]);
+        if (!isNaN(n)) {
+          sum += n;
+          cnt++;
+        }
+      });
+      if (cnt === 0) {
+        painEl.textContent = "0.0";
+        painExtraEl.textContent = "통증 강도 입력 데이터 없음";
+      } else {
+        const avg = (sum / cnt).toFixed(1);
+        painEl.textContent = avg;
+        const v = Number(avg);
+        let txt = "";
+        if (v <= 3) txt = "전반적으로 경미한 통증 케이스가 많습니다.";
+        else if (v <= 6) txt = "중간 정도의 통증 케이스 비율이 높습니다.";
+        else txt = "고강도 통증으로 내원하는 회원이 많은 편입니다.";
+        painExtraEl.textContent = txt;
+      }
+
+      const purposeCount = {};
+      allData.forEach((d) => {
+        const arr = d.purposes || d.purpose || [];
+        const list = Array.isArray(arr) ? arr : [arr];
+        list.forEach((p) => {
+          const key = String(p || "").trim();
+          if (!key) return;
+          purposeCount[key] = (purposeCount[key] || 0) + 1;
+        });
+      });
+
+      let topPurpose = "-";
+      let maxCnt = 0;
+      Object.entries(purposeCount).forEach(([k, c]) => {
+        if (c > maxCnt) {
+          maxCnt = c;
+          topPurpose = k;
+        }
+      });
+
+      purposeEl.textContent = topPurpose;
+      purposeExtraEl.textContent = topPurpose === "-" ? "" : `총 ${maxCnt}명이 선택`;
+    }
+
+    // ====== 필터 / 검색 ======
+    function applyFilters() {
+      const keyword = searchInput.value.trim().toLowerCase();
+      const fromStr = dateFromInput.value;
+      const toStr = dateToInput.value;
+
+      const fromTime = fromStr ? new Date(fromStr + "T00:00:00").getTime() : null;
+      const toTime = toStr ? new Date(toStr + "T23:59:59").getTime() : null;
+
+      filteredData = allData.filter((d) => {
+        const json = JSON.stringify(d).toLowerCase();
+        if (keyword && !json.includes(keyword)) return false;
+
+        if (fromTime || toTime) {
+          const t = d.createdAt ? new Date(d.createdAt).getTime() : null;
+          if (!t) return false;
+          if (fromTime && t < fromTime) return false;
+          if (toTime && t > toTime) return false;
+        }
+
+        return true;
+      });
+
+      currentPage = 1;
+      if (currentSortKey) sortData(currentSortKey, currentSortDir);
+      renderTable();
+    }
+
+    function resetFilters() {
+      searchInput.value = "";
+      dateFromInput.value = "";
+      dateToInput.value = "";
+      filteredData = [...allData];
+      currentPage = 1;
+      if (currentSortKey) sortData(currentSortKey, currentSortDir);
+      renderTable();
+    }
+
+    searchInput.addEventListener("input", applyFilters);
+    dateFromInput.addEventListener("change", applyFilters);
+    dateToInput.addEventListener("change", applyFilters);
+
+    // ====== 정렬 / 페이지네이션 / 테이블 렌더 ======
+    function sortData(key, dir) {
+      filteredData.sort((a, b) => {
+        let va = a[key];
+        let vb = b[key];
+
+        if (key === "createdAt") {
+          va = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          vb = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        }
+
+        if (key === "age" || key === "pain_level") {
+          va = Number(va || 0);
+          vb = Number(vb || 0);
+        }
+
+        if (typeof va === "string") va = va.toLowerCase();
+        if (typeof vb === "string") vb = vb.toLowerCase();
+
+        if (va < vb) return dir === "asc" ? -1 : 1;
+        if (va > vb) return dir === "asc" ? 1 : -1;
+        return 0;
+      });
+    }
+
+    function changePage(direction) {
+      const totalPages = Math.max(1, Math.ceil(filteredData.length / PAGE_SIZE));
+      if (direction === "prev") {
+        if (currentPage > 1) currentPage--;
+      } else if (direction === "next") {
+        if (currentPage < totalPages) currentPage++;
+      } else if (typeof direction === "number") {
+        if (direction >= 1 && direction <= totalPages) currentPage = direction;
+      }
+      renderTable();
+    }
+
+    function renderPagination(totalPages) {
+      if (!paginationEl) return;
+      if (totalPages <= 1 || filteredData.length === 0) {
+        paginationEl.style.display = "none";
+        return;
+      }
+      paginationEl.style.display = "flex";
+      pageInfoEl.textContent = `페이지 ${currentPage} / ${totalPages}`;
+    }
+
+    function renderTable() {
+      tableBody.innerHTML = "";
+
+      if (!filteredData.length) {
+        noDataEl.style.display = "block";
+        renderPagination(1);
+        return;
+      }
+      noDataEl.style.display = "none";
+
+      const totalPages = Math.max(1, Math.ceil(filteredData.length / PAGE_SIZE));
+      if (currentPage > totalPages) currentPage = totalPages;
+
+      const start = (currentPage - 1) * PAGE_SIZE;
+      const pageItems = filteredData.slice(start, start + PAGE_SIZE);
+
+      pageItems.forEach((d) => {
+        const tr = document.createElement("tr");
+        tr.addEventListener("click", () => openDetail(d));
+
+        const purposes = normalizeMulti(d.purposes || d.purpose);
+        const mainPurpose = purposes[0] || "-";
+
+        const created = d.createdAt ? new Date(d.createdAt) : null;
+        const createdStr =
+          created && !isNaN(created)
+            ? `${created.getFullYear()}-${String(created.getMonth() + 1).padStart(
+                2,
+                "0"
+              )}-${String(created.getDate()).padStart(2, "0")}`
+            : "-";
+
+        const tags = normalizeMulti(d.tags);
+
+        tr.innerHTML = `
+          <td>${escapeHtml(d.name || "-")}</td>
+          <td>${escapeHtml(d.phone || "-")}</td>
+          <td>${d.age || "-"}</td>
+          <td>${d.gender || "-"}</td>
+          <td>${
+            mainPurpose !== "-"
+              ? `<span class="pill">${escapeHtml(mainPurpose)}</span>`
+              : "-"
+          }</td>
+          <td>${
+            d.pain_level !== undefined && d.pain_level !== null
+              ? d.pain_level + "/10"
+              : "-"
+          }</td>
+          <td>${createdStr}</td>
+          <td>${
+            tags.length
+              ? `<span class="pill pill-tag">${escapeHtml(tags[0])}${
+                  tags.length > 1 ? ` 외 ${tags.length - 1}` : ""
+                }</span>`
+              : "-"
+          }</td>
+        `;
+
+        tableBody.appendChild(tr);
+      });
+
+      renderPagination(totalPages);
+    }
+
+    document.querySelectorAll("th.sortable").forEach((th) => {
+      th.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const key = th.dataset.key;
+        if (!key) return;
+        if (currentSortKey === key) {
+          currentSortDir = currentSortDir === "asc" ? "desc" : "asc";
+        } else {
+          currentSortKey = key;
+          currentSortDir = "asc";
+        }
+        sortData(currentSortKey, currentSortDir);
+        currentPage = 1;
+        renderTable();
+      });
+    });
+
+    // ====== 상세 모달 + 태그 ======
+    const backdrop = document.getElementById("detail-backdrop");
+    const detailTitleEl = document.getElementById("detail-title");
+    const detailMetaEl = document.getElementById("detail-meta");
+    const detailBodyEl = document.getElementById("detail-body");
+
+    function openDetail(d) {
+      currentDetailEntry = d;
+      if (!currentDetailEntry.tags) currentDetailEntry.tags = [];
+
+      detailTitleEl.textContent = d.name ? `${d.name}님 문진 상세` : "문진 상세";
+
+      const created = d.createdAt ? new Date(d.createdAt) : null;
+      const createdStr =
+        created && !isNaN(created)
+          ? `${created.getFullYear()}-${String(created.getMonth() + 1).padStart(
+              2,
+              "0"
+            )}-${String(created.getDate()).padStart(2, "0")} ${String(
+              created.getHours()
+            ).padStart(2, "0")}:${String(created.getMinutes()).padStart(2, "0")}`
+          : "-";
+
+      detailMetaEl.textContent = `${d.phone || "-"} · 작성일 ${createdStr}`;
+
+      const purposes = normalizeMulti(d.purposes || d.purpose);
+      const painTypes = normalizeMulti(d.pain_types || d.pain_type);
+      const postures = normalizeMulti(d.postures || d.posture);
+      const skeleton = normalizeMulti(d.skeleton_issues || d.skeleton);
+      const goals = normalizeMulti(d.goals || d.goal);
+
+      detailBodyEl.innerHTML = `
+        <div class="modal-section">
+          <div class="modal-section-title">⭐ 케이스 태그</div>
+          <div class="modal-row" id="tag-list-row"></div>
+          <div class="modal-row" style="margin-top:4px; display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+            <input id="tag-input" type="text" placeholder="예: 재등록유력, 추가검사필요 등" class="login-input" style="margin-bottom:0; max-width:220px; padding:6px 8px; font-size:0.78rem;" />
+            <button type="button" class="btn btn-outline btn-sm" onclick="addTagFromInput()">태그 추가</button>
+          </div>
+          <div class="modal-note">
+            상담 중 떠오른 메모를 간단히 태그로 남겨두면, 나중에 재내원/관리 우선순위를 정할 때 유용합니다.
+          </div>
+        </div>
+
+        <div class="modal-section">
+          <div class="modal-section-title">📌 1. 기본 정보</div>
+          <div class="modal-row">
+            <span class="modal-label">이름 / 성별 / 나이</span><br/>
+            ${escapeHtml(d.name || "-")} / ${d.gender || "-"} / ${
+        d.age ? d.age + "세" : "-"
+      }
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">연락처</span><br/>
+            ${escapeHtml(d.phone || "-")}
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">내원일(예약 예정일)</span><br/>
+            ${escapeHtml(d.visit_date || "-")}
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">직업</span><br/>
+            ${escapeHtml(d.job || "-")}
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">주 사용 손</span><br/>
+            ${escapeHtml(d.hand || "-")}
+          </div>
+        </div>
+
+        <div class="modal-section">
+          <div class="modal-section-title">📌 2. 내원 목적</div>
+          <div class="modal-row">
+            ${renderChips(purposes) || "-"}
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">기타</span><br/>
+            ${escapeHtml(d.purpose_etc || "-")}
+          </div>
+        </div>
+
+        <div class="modal-section">
+          <div class="modal-section-title">📌 3. 통증 관련 문진</div>
+          <div class="modal-row">
+            <span class="modal-label">통증 부위</span><br/>
+            ${escapeHtml(d.pain_area || "-")}
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">통증 강도</span><br/>
+            ${
+              d.pain_level !== undefined && d.pain_level !== null
+                ? d.pain_level + "/10"
+                : "-"
+            }
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">통증 양상</span><br/>
+            ${renderChips(painTypes) || "-"}
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">통증 양상 기타</span><br/>
+            ${escapeHtml(d.pain_type_etc || "-")}
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">통증 발생 시기</span><br/>
+            ${escapeHtml(d.pain_onset || "-")}
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">하루 중 가장 아픈 시간대</span><br/>
+            ${escapeHtml(d.pain_time || "-")}
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">악화되는 상황</span><br/>
+            ${escapeHtml(d.pain_worse || "-")}
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">완화되는 상황</span><br/>
+            ${escapeHtml(d.pain_better || "-")}
+          </div>
+        </div>
+
+        <div class="modal-section">
+          <div class="modal-section-title">📌 4. 생활·자세 패턴</div>
+          <div class="modal-row">
+            <span class="modal-label">하루 평균 앉아 있는 시간</span><br/>
+            ${escapeHtml(d.sitting || "-")}
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">주된 자세</span><br/>
+            ${renderChips(postures) || "-"}
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">주된 자세 기타</span><br/>
+            ${escapeHtml(d.posture_etc || "-")}
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">수면 시간</span><br/>
+            ${d.sleep_hours ? d.sleep_hours + "시간" : "-"}
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">수면 시 불편함</span><br/>
+            ${escapeHtml(d.sleep_discomfort || "-")}
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">스트레스 수준</span><br/>
+            ${escapeHtml(d.stress || "-")}
+          </div>
+        </div>
+
+        <div class="modal-section">
+          <div class="modal-section-title">📌 5. 운동/활동 수준</div>
+          <div class="modal-row">
+            <span class="modal-label">현재 운동 여부</span><br/>
+            ${escapeHtml(d.exercise_now || "-")}
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">운동 빈도</span><br/>
+            ${d.exercise_freq ? d.exercise_freq + "회/주" : "-"}
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">운동 종류</span><br/>
+            ${escapeHtml(d.exercise_type || "-")}
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">이전 부상/수술 경험</span><br/>
+            ${escapeHtml(d.injury || "-")}
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">부위/시기</span><br/>
+            ${escapeHtml(d.injury_detail || "-")}
+          </div>
+        </div>
+
+        <div class="modal-section">
+          <div class="modal-section-title">📌 6. 골격·체형 자가 진단</div>
+          <div class="modal-row">
+            ${renderChips(skeleton) || "-"}
+          </div>
+        </div>
+
+        <div class="modal-section">
+          <div class="modal-section-title">📌 7. 목표 설정</div>
+          <div class="modal-row">
+            <span class="modal-label">주요 목표</span><br/>
+            ${renderChips(goals) || "-"}
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">기타 목표</span><br/>
+            ${escapeHtml(d.goal_etc || "-")}
+          </div>
+        </div>
+
+        <div class="modal-section">
+          <div class="modal-section-title">📌 8. 기타 참고 사항</div>
+          <div class="modal-row">
+            ${escapeHtml(d.notes || "-")}
+          </div>
+        </div>
+      `;
+
+      renderTagList();
+      backdrop.classList.add("active");
+    }
+
+    function renderTagList() {
+      const container = document.getElementById("tag-list-row");
+      if (!container || !currentDetailEntry) return;
+      const tags = normalizeMulti(currentDetailEntry.tags);
+      if (!tags.length) {
+        container.innerHTML = `<span class="modal-label">등록된 태그가 없습니다. 위 입력창에서 태그를 추가해 보세요.</span>`;
+        return;
+      }
+      container.innerHTML = tags
+        .map(
+          (tag, idx) => `
+          <span class="pill pill-tag">
+            ${escapeHtml(tag)}
+            <button type="button" class="tag-remove" onclick="removeTag(${idx}); event.stopPropagation();">×</button>
+          </span>
+        `
+        )
+        .join("");
+    }
+
+    function addTagFromInput() {
+      if (!currentDetailEntry) return;
+      const input = document.getElementById("tag-input");
+      if (!input) return;
+      const value = input.value.trim();
+      if (!value) return;
+
+      if (!currentDetailEntry.tags) currentDetailEntry.tags = [];
+      if (!currentDetailEntry.tags.includes(value)) {
+        currentDetailEntry.tags.push(value);
+        saveAllData();
+        renderTagList();
+        renderTable();
+        updateDuplicates();
+        updateConsentTable();
+      }
+      input.value = "";
+    }
+
+    function removeTag(index) {
+      if (!currentDetailEntry || !currentDetailEntry.tags) return;
+      currentDetailEntry.tags.splice(index, 1);
+      saveAllData();
+      renderTagList();
+      renderTable();
+      updateDuplicates();
+      updateConsentTable();
+    }
+
+    function closeDetail() {
+      backdrop.classList.remove("active");
+      currentDetailEntry = null;
+    }
+
+    backdrop.addEventListener("click", (e) => {
+      if (e.target === backdrop) closeDetail();
+    });
+
+    // ====== GRAPH ======>
+    function updateChart() {
+      const ctx = document.getElementById("symptomChart").getContext("2d");
+
+      const counts = {};
+      allData.forEach((d) => {
+        const list = normalizeMulti(d.pain_types || d.pain_type);
+        list.forEach((t) => {
+          const key = t.trim();
+          if (!key) return;
+          counts[key] = (counts[key] || 0) + 1;
+        });
+      });
+
+      const labels = Object.keys(counts);
+      const values = Object.values(counts);
+
+      if (symptomChart) symptomChart.destroy();
+
+      symptomChart = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels,
+          datasets: [
+            {
+              label: "선택 횟수",
+              data: values,
+              backgroundColor: "#bfdbfe",
+              borderColor: "#2563eb",
+              borderWidth: 1
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: { enabled: true }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { stepSize: 1 }
+            }
+          }
+        }
+      });
+    }
+
+    // ====== 중복 내원자 요약 ======>
+    function updateDuplicates() {
+      const tbody = document.querySelector("#duplicate-table tbody");
+      const noDup = document.getElementById("no-duplicate");
+      tbody.innerHTML = "";
+
+      if (!allData.length) {
+        noDup.style.display = "block";
+        return;
+      }
+
+      const map = {};
+      allData.forEach((d) => {
+        const name = (d.name || "").trim();
+        const phone = (d.phone || "").trim();
+        if (!name || !phone) return;
+        const key = name.toLowerCase() + "|" + phone;
+        const created = d.createdAt ? new Date(d.createdAt).getTime() : 0;
+        if (!map[key]) {
+          map[key] = { name, phone, count: 0, last: 0 };
+        }
+        map[key].count += 1;
+        if (created > map[key].last) map[key].last = created;
+      });
+
+      const duplicates = Object.values(map).filter((v) => v.count >= 2);
+      if (!duplicates.length) {
+        noDup.style.display = "block";
+        return;
+      }
+      noDup.style.display = "none";
+
+      duplicates.sort((a, b) => b.last - a.last);
+
+      duplicates.forEach((item) => {
+        const tr = document.createElement("tr");
+        const lastDate = item.last
+          ? (() => {
+              const d = new Date(item.last);
+              return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
+                2,
+                "0"
+              )}-${String(d.getDate()).padStart(2, "0")}`;
+            })()
+          : "-";
+
+        tr.innerHTML = `
+          <td>${escapeHtml(item.name)}</td>
+          <td>${escapeHtml(item.phone)}</td>
+          <td>${item.count}</td>
+          <td>${lastDate}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // ====== 동의서 테이블 ======>
+    function updateConsentTable() {
+      const tbody = document.querySelector("#consent-table tbody");
+      const noConsent = document.getElementById("no-consent");
+      tbody.innerHTML = "";
+
+      const rows = allData.filter((d) => d.consent);
+      if (!rows.length) {
+        noConsent.style.display = "block";
+        return;
+      }
+      noConsent.style.display = "none";
+
+      rows.forEach((d) => {
+        const c = d.consent || {};
+        const consentName = c.consent_name || "-";
+        const consentDate = c.consent_date || "-";
+        const personal = c.agree_personal ? "동의" : "미동의";
+        const media = c.agree_media ? "동의" : "미동의";
+        const ai = c.agree_ai ? "동의" : "미동의";
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${escapeHtml(d.name || "-")}</td>
+          <td>${escapeHtml(d.phone || "-")}</td>
+          <td>${escapeHtml(consentName)}</td>
+          <td>${escapeHtml(consentDate || "-")}</td>
+          <td>${personal}</td>
+          <td>${media}</td>
+          <td>${ai}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // ====== CSV EXPORT ======>
+    function exportCSV() {
+      if (!allData.length) {
+        alert("내보낼 문진 데이터가 없습니다.");
+        return;
+      }
+
+      const headers = [
+        "name",
+        "phone",
+        "age",
+        "gender",
+        "visit_date",
+        "job",
+        "hand",
+        "purposes",
+        "purpose_etc",
+        "pain_area",
+        "pain_level",
+        "pain_types",
+        "pain_type_etc",
+        "pain_onset",
+        "pain_time",
+        "pain_worse",
+        "pain_better",
+        "sitting",
+        "postures",
+        "posture_etc",
+        "sleep_hours",
+        "sleep_discomfort",
+        "stress",
+        "exercise_now",
+        "exercise_freq",
+        "exercise_type",
+        "injury",
+        "injury_detail",
+        "skeleton_issues",
+        "goals",
+        "goal_etc",
+        "notes",
+        "tags",
+        "consent_name",
+        "consent_date",
+        "agree_personal",
+        "agree_media",
+        "agree_ai",
+        "createdAt"
+      ];
+
+      const rows = allData.map((d) => {
+        return headers
+          .map((h) => {
+            let v = "";
+
+            if (h === "consent_name") {
+              v = d.consent && d.consent.consent_name ? d.consent.consent_name : "";
+            } else if (h === "consent_date") {
+              v = d.consent && d.consent.consent_date ? d.consent.consent_date : "";
+            } else if (h === "agree_personal") {
+              v = d.consent && d.consent.agree_personal ? "동의" : "미동의";
+            } else if (h === "agree_media") {
+              v = d.consent && d.consent.agree_media ? "동의" : "미동의";
+            } else if (h === "agree_ai") {
+              v = d.consent && d.consent.agree_ai ? "동의" : "미동의";
+            } else {
+              v = d[h];
+              if (Array.isArray(v)) v = v.join(" / ");
+              if (v === undefined || v === null) v = "";
+            }
+
+            v = String(v).replace(/"/g, '""');
+            return `"${v}"`;
+          })
+          .join(",");
+      });
+
+      const csv = [headers.join(","), ...rows].join("\n");
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "godmade_intake_export.csv";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // ====== GOOGLE SHEETS SYNC (전체 동기화) ======>
+    async function syncAllToGoogleSheets() {
+      if (!GOOGLE_SHEETS_WEBAPP_URL) {
+        alert("먼저 admin.html 상단의 GOOGLE_SHEETS_WEBAPP_URL 값을 채워주세요.");
+        return;
+      }
+      if (!allData.length) {
+        alert("동기화할 문진 데이터가 없습니다.");
+        return;
+      }
+
+      const ok = confirm(
+        "현재 브라우저에 저장된 모든 문진 데이터를 구글 시트와 동기화할까요?\n" +
+        "※ 이미 전송된 데이터가 다시 들어갈 수 있으니, 같은 브라우저에서 여러 번 동기화할 땐 주의해주세요."
+      );
+      if (!ok) return;
+
+      try {
+        await fetch(GOOGLE_SHEETS_WEBAPP_URL, {
+          method: "POST",
+          mode: "no-cors", // 응답은 안 읽고 조용히 요청만 보냄
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
+          body: JSON.stringify({ entries: allData })
+        });
+
+        alert(
+          "구글 시트로 동기화 요청을 전송했습니다.\n" +
+          "몇 초 뒤 구글 시트에서 [원본데이터] 탭을 새로고침해서 실제로 행이 추가됐는지 확인해 주세요."
+        );
+      } catch (e) {
+        console.error("구글 시트 동기화 중 네트워크 오류:", e);
+        alert(
+          "네트워크 문제로 구글 시트 동기화 요청을 보내지 못했습니다.\n" +
+          "인터넷 연결을 확인한 뒤 다시 시도해 주세요."
+        );
+      }
+    }
+
+    // ====== UTIL ======>
+    function normalizeMulti(value) {
+      if (!value) return [];
+      if (Array.isArray(value)) return value;
+      return [value];
+    }
+
+    function renderChips(list) {
+      if (!list || !list.length) return "";
+      return list
+        .filter((x) => String(x).trim() !== "")
+        .map((x) => `<span class="pill">${escapeHtml(x)}</span>`)
+        .join("");
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
+    function clearData() {
+      localStorage.removeItem("gm_posture_submissions");
+      allData = [];
+      filteredData = [];
+      currentPage = 1;
+      updateStats();
+      updateChart();
+      renderTable();
+      updateDuplicates();
+      updateConsentTable();
+    }
+  </script>
+</body>
+</html>
