@@ -869,7 +869,7 @@
     // ====== 설정 ======
     const ADMIN_PASSWORD = "godmade2024!"; // ★ 원하는 기본 비번
     const GOOGLE_SHEETS_WEBAPP_URL =
-      "https://script.google.com/macros/s/AKfycbynHi_DfiJhDe6BD9o5hVlz9VKsEuCzQO9AcJKIpn-2hiItqStvTbxOkaA9ICdT6UlTCA/exec"; // ★ 새 웹앱 URL
+      "https://script.google.com/macros/s/AKfycbynHi_DfiJhDe6BD9o5hVlz9VKsEuCzQO9AcJKIpn-2hiItqStvTbxOkaA9ICdT6UlTCA/exec"; // ★ 웹앱 URL
     const PAGE_SIZE = 15;
 
     let allData = [];
@@ -1002,6 +1002,7 @@
       const raw = localStorage.getItem("gm_posture_submissions");
       allData = raw ? JSON.parse(raw) : [];
 
+      // 최신 순 정렬
       allData.sort((a, b) => {
         const ta = a.createdAt ? new Date(a.createdAt).getTime() : 0;
         const tb = b.createdAt ? new Date(b.createdAt).getTime() : 0;
@@ -1045,10 +1046,9 @@
       const last = allData[0];
       const created = last.createdAt ? new Date(last.createdAt) : null;
       if (created && !isNaN(created)) {
-        const d = `${created.getFullYear()}-${String(created.getMonth() + 1).padStart(
-          2,
-          "0"
-        )}-${String(created.getDate()).padStart(2, "0")}`;
+        const d = `${created.getFullYear()}-${String(
+          created.getMonth() + 1
+        ).padStart(2, "0")}-${String(created.getDate()).padStart(2, "0")}`;
         lastEl.textContent = "최근 작성: " + d;
       } else {
         lastEl.textContent = "최근 작성: -";
@@ -1534,7 +1534,7 @@
       if (e.target === backdrop) closeDetail();
     });
 
-    // ====== GRAPH ======
+    // ====== GRAPH ======>
     function updateChart() {
       const ctx = document.getElementById("symptomChart").getContext("2d");
 
@@ -1583,7 +1583,7 @@
       });
     }
 
-    // ====== 중복 내원자 요약 ======
+    // ====== 중복 내원자 요약 ======>
     function updateDuplicates() {
       const tbody = document.querySelector("#duplicate-table tbody");
       const noDup = document.getElementById("no-duplicate");
@@ -1639,7 +1639,7 @@
       });
     }
 
-    // ====== 동의서 테이블 ======
+    // ====== 동의서 테이블 ======>
     function updateConsentTable() {
       const tbody = document.querySelector("#consent-table tbody");
       const noConsent = document.getElementById("no-consent");
@@ -1674,7 +1674,7 @@
       });
     }
 
-    // ====== CSV EXPORT ======
+    // ====== CSV EXPORT ======>
     function exportCSV() {
       if (!allData.length) {
         alert("내보낼 문진 데이터가 없습니다.");
@@ -1760,7 +1760,7 @@
       URL.revokeObjectURL(url);
     }
 
-    // ====== GOOGLE SHEETS SYNC (전체 동기화) ======
+    // ====== GOOGLE SHEETS SYNC (전체 동기화) ======>
     async function syncAllToGoogleSheets() {
       if (!GOOGLE_SHEETS_WEBAPP_URL) {
         alert("먼저 admin.html 상단의 GOOGLE_SHEETS_WEBAPP_URL 값을 채워주세요.");
@@ -1772,43 +1772,35 @@
       }
 
       const ok = confirm(
-        "현재 브라우저에 저장된 모든 문진 데이터를 구글 시트와 동기화할까요?"
+        "현재 브라우저에 저장된 모든 문진 데이터를 구글 시트와 동기화할까요?\n" +
+        "※ 이미 전송된 데이터가 다시 들어갈 수 있으니, 같은 브라우저에서 여러 번 동기화할 땐 주의해주세요."
       );
       if (!ok) return;
 
       try {
-        const res = await fetch(GOOGLE_SHEETS_WEBAPP_URL, {
+        await fetch(GOOGLE_SHEETS_WEBAPP_URL, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          mode: "no-cors", // 응답은 안 읽고 조용히 요청만 보냄
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
           body: JSON.stringify({ entries: allData })
         });
 
-        const text = await res.text();
-        let json;
-        try {
-          json = JSON.parse(text);
-        } catch (e) {
-          console.error("응답 JSON 파싱 실패:", text);
-        }
-
-        if (!res.ok || !json || json.ok === false) {
-          console.error("응답 상태:", res.status, text);
-          alert(
-            "구글 시트 동기화 중 오류가 발생했습니다.\n실제 저장 여부는 구글 Apps Script 로그에서 확인해 주세요."
-          );
-          return;
-        }
-
-        alert("구글 시트로 동기화 요청을 전송했습니다.\n시트에서 [원본데이터] 탭을 확인해 주세요.");
-      } catch (e) {
-        console.error(e);
         alert(
-          "구글 시트 동기화 중 오류가 발생했습니다. 브라우저 콘솔(Console) 로그를 확인해 주세요."
+          "구글 시트로 동기화 요청을 전송했습니다.\n" +
+          "몇 초 뒤 구글 시트에서 [원본데이터] 탭을 새로고침해서 실제로 행이 추가됐는지 확인해 주세요."
+        );
+      } catch (e) {
+        console.error("구글 시트 동기화 중 네트워크 오류:", e);
+        alert(
+          "네트워크 문제로 구글 시트 동기화 요청을 보내지 못했습니다.\n" +
+          "인터넷 연결을 확인한 뒤 다시 시도해 주세요."
         );
       }
     }
 
-    // ====== UTIL ======
+    // ====== UTIL ======>
     function normalizeMulti(value) {
       if (!value) return [];
       if (Array.isArray(value)) return value;
